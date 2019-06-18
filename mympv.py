@@ -24,6 +24,17 @@ if len(args.paths) == 0:
 else:
     inputs = args.paths
 
+def checkmime(p, ln):
+    mime, enc = mimetypes.guess_type(str(p))
+    if mime:
+        if re.match(r'(image|video)', mime):
+            if ln:
+                ln = Path(td.name) / Path(ln)
+                ln.symlink_to(p)
+                p = ln
+            return p
+    return None
+
 if len(args.paths) != 1:
     for line in inputs:
         line = line.strip()
@@ -33,25 +44,22 @@ if len(args.paths) != 1:
         if len(line) == 2:
             ln = line[1]
         l = Path(re.sub(r'^file://', '', l))
-        if l.exists() and not l.is_dir():
-            mime, enc = mimetypes.guess_type(str(l))
-            if mime:
-                if re.match(r'(image|video)', mime):
-                    if ln:
-                        ln = Path(td.name) / Path(ln)
-                        ln.symlink_to(l)
-                        l = ln
-                    paths.append(l)
+        if l.exists():
+            l = checkmime(l, ln)
+            if l:
+                paths.append(l)
 else:
     line = inputs[0]
     line = line.strip()
     line = line.split("\t")
     l = Path(line[0])
     if l.is_dir():
-        for p in l.iterdir():
-            paths.append(p)
+        cur = l.iterdir()
     else:
-        for p in l.parent.iterdir():
+        cur = l.parent.iterdir()
+    for p in cur:
+        p = checkmime(p, None)
+        if p:
             paths.append(p)
 
 paths = list(set(paths))
