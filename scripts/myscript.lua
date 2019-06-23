@@ -6,9 +6,7 @@ function show_playlist()
     mp.commandv("show_text", tostring(t))
 end
 
-mp.add_key_binding(nil, "show_playlist", function()
-    show_playlist()
-end)
+mp.add_key_binding(nil, "show_playlist", function() show_playlist() end)
 
 mp.add_key_binding(nil, "delete-confirm-and-next", function()
     local path = mp.get_property("stream-path")
@@ -19,7 +17,6 @@ mp.add_key_binding(nil, "delete-confirm-and-next", function()
     result = string.gsub(result, "%s+", "")
     if result == "0" then
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        mp.commandv("playlist-next")
         os.execute("rm " .. path)
         show_playlist()
     end
@@ -29,7 +26,6 @@ mp.add_key_binding(nil, "delete-and-next", function()
     if not mp.get_property("audio-codec") then
         local path = mp.get_property("stream-path")
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        mp.commandv("playlist-next")
         os.execute("mv " .. path .. " /tmp/")
         show_playlist()
     end
@@ -39,7 +35,6 @@ mp.add_key_binding(nil, "move-and-next", function()
     if not mp.get_property("audio-codec") then
         local path = mp.get_property("stream-path")
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        mp.commandv("playlist-next")
         os.execute("mv " .. path .. " ~/Pictures/2d/")
         show_playlist()
     end
@@ -79,13 +74,31 @@ mp.add_key_binding(nil, "right", function()
     end
 end)
 
-mp.add_key_binding(nil, "home",
-                   function() mp.set_property("playlist-pos-1", 1) end)
+mp.add_key_binding(nil, "home", function()
+    mp.set_property("playlist-pos-1", 1)
+    show_playlist()
+end)
 
 mp.add_key_binding(nil, "end", function()
     mp.set_property("playlist-pos-1", mp.get_property("playlist-count"))
+    show_playlist()
 end)
 
-mp.add_key_binding(nil, "test", function() show_playlist()
-    formp.get_property("playlist")
+mp.add_key_binding(nil, "rotate", function()
+    local v = mp.get_property("options/video-rotate")
+    v = v + 90
+    if v >= 360 then
+      v = v - 360
+    end
+    mp.set_property("options/video-rotate", v)
+
+end)
+
+mp.add_key_binding(nil, "test", function()
+    local t = mp.set_property("options/video-rotate", 90)
+    mp.commandv("show_text", tostring(t))
+end)
+
+mp.register_script_message("zoom", function()
+    print("a")
 end)

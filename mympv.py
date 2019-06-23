@@ -63,7 +63,7 @@ else:
             paths.append(p)
 
 paths = list(set(paths))
-
+print(paths)
 proc = ["mpv"]
 if len(paths):
     if args.order == "default":
@@ -89,4 +89,7 @@ if len(paths):
         proc.append("--playlist-start=" + str(playlist_start))
 
 proc += [str(x) for x in paths]
-Popen(proc).communicate()
+proc = Popen(proc, stderr=PIPE, stdout=PIPE)
+for p in paths:
+    p.read_bytes()
+proc.communicate()
