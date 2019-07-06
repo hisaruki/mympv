@@ -5,7 +5,7 @@ from subprocess import Popen, PIPE
 import argparse
 import re
 import sys
-import mimetypes
+from magic import Magic
 import tempfile
 from pathlib import Path
 
@@ -25,7 +25,8 @@ else:
     inputs = args.paths
 
 def checkmime(p, ln):
-    mime, enc = mimetypes.guess_type(str(p))
+    m = Magic(mime=True)
+    mime = m.from_file(str(p))
     if mime:
         if re.match(r'(image|video)', mime):
             if ln:
@@ -63,7 +64,7 @@ else:
             paths.append(p)
 
 paths = list(set(paths))
-print(paths)
+
 proc = ["mpv"]
 if len(paths):
     if args.order == "default":
@@ -89,7 +90,6 @@ if len(paths):
         proc.append("--playlist-start=" + str(playlist_start))
 
 proc += [str(x) for x in paths]
-proc = Popen(proc, stderr=PIPE, stdout=PIPE)
+proc = Popen(proc)
 for p in paths:
     p.read_bytes()
-proc.communicate()
