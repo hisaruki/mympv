@@ -6,6 +6,7 @@ import argparse
 import re
 import sys
 from magic import Magic
+from mimetypes import guess_type
 import tempfile
 from pathlib import Path
 
@@ -17,6 +18,7 @@ args = parser.parse_args()
 
 
 td = tempfile.TemporaryDirectory()
+magic = Magic(mime=True)
 paths = []
 
 if len(args.paths) == 0:
@@ -25,8 +27,11 @@ else:
     inputs = args.paths
 
 def checkmime(p, ln):
-    m = Magic(mime=True)
-    mime = m.from_file(str(p))
+    if p.is_dir():
+        return None
+    mime, e = guess_type(p.name)
+    if not mime:
+        mime = magic.from_buffer(p.open("rb").read(1024))
     if mime:
         if re.match(r'(image|video)', mime):
             if ln:
