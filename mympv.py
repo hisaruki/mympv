@@ -74,9 +74,8 @@ proc = ["mpv"]
 if len(paths):
     if args.order == "default":
         args.order = "filename"
-        ils = list(filter(lambda x: re.match(
-            r'^[0-9a-z]{32}$', x.stem), paths))
-        if len(ils) / len(paths) >= 0.5:
+        ils = list(filter(lambda x: re.search(r'[0-9a-z]{32}$', x.stem), paths))
+        if len(ils) / len(paths) >= 0.33:
             args.order = "mtime"
 
     if args.order == "filename":
@@ -97,4 +96,4 @@ if len(paths):
 proc += [str(x) for x in paths]
 proc = Popen(proc)
 for p in paths:
-    p.read_bytes()
+    p.open("rb").read(1024*1024*8)

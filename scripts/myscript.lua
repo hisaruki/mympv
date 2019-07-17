@@ -95,9 +95,6 @@ mp.add_key_binding(nil, "rotate", function()
 
 end)
 
-mp.add_key_binding(nil, "test", function()
-end)
-
 mp.add_key_binding(nil, "info", function()
     local path = mp.get_property("stream-path")
     local handle = io.popen(
@@ -110,3 +107,9 @@ mp.add_key_binding(nil, "info", function()
     mp.commandv("show_text", tostring(result), "6000")
     
 end)
+
+mp.add_key_binding(nil, "resetpan", function()
+    mp.set_property("video-pan-x", 0)
+    mp.set_property("video-pan-y", 0)
+end)
+
