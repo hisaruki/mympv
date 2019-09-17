@@ -1,8 +1,8 @@
 require 'os'
 
 function show_playlist()
-    local t = tostring(mp.get_property("playlist-pos-1")) .. "/" ..
-                  tostring(mp.get_property("playlist-count"))
+    local t = tostring(mp.get_property("playlist-pos-1"))
+    t = t  .. "/" .. tostring(mp.get_property("playlist-count"))
     mp.commandv("show_text", tostring(t))
 end
 
@@ -43,7 +43,7 @@ end)
 
 mp.add_key_binding(nil, "up", function()
     if mp.get_property("audio-codec") then
-        mp.commandv("no-osd", "seek", "-10", "keyframes")
+        mp.commandv("osd-bar", "seek", "-3", "relative-percent+exact")
     else
         mp.commandv("playlist-prev")
         show_playlist()
@@ -51,7 +51,7 @@ mp.add_key_binding(nil, "up", function()
 end)
 mp.add_key_binding(nil, "down", function()
     if mp.get_property("audio-codec") then
-        mp.commandv("no-osd", "seek", "10", "keyframes")
+        mp.commandv("osd-bar", "seek", "3", "relative-percent+exact")
     else
         mp.commandv("playlist-next")
         show_playlist()
@@ -77,12 +77,10 @@ end)
 
 mp.add_key_binding(nil, "home", function()
     mp.set_property("playlist-pos-1", 1)
-    show_playlist()
 end)
 
 mp.add_key_binding(nil, "end", function()
     mp.set_property("playlist-pos-1", mp.get_property("playlist-count"))
-    show_playlist()
 end)
 
 mp.add_key_binding(nil, "rotate", function()
@@ -97,6 +95,8 @@ end)
 
 mp.add_key_binding(nil, "info", function()
     local path = mp.get_property("stream-path")
+
+    --[[
     local handle = io.popen(
         "sankaku -vvv --files "
         .. path
@@ -104,6 +104,8 @@ mp.add_key_binding(nil, "info", function()
     )
     local result = handle:read("*a")
     handle:close()
+    ]]--
+    local result = tostring(path)
     mp.commandv("show_text", tostring(result), "6000")
     
 end)

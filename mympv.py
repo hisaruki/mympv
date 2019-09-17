@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("paths", nargs="*")
 parser.add_argument("--order", default="default")
 parser.add_argument("--reverse", action="store_true")
+parser.add_argument("--prefetch", type=int, default=512*1024*1024)
 args = parser.parse_args()
 
 
@@ -95,5 +96,10 @@ if len(paths):
 
 proc += [str(x) for x in paths]
 proc = Popen(proc)
-for p in paths:
-    p.open("rb").read(1024*1024*8)
+
+while args.prefetch > 0:
+    if len(paths):
+        args.prefetch -= len(paths.pop().read_bytes())
+    else:
+        args.prefetch = 0
+
