@@ -102,4 +102,3 @@ while args.prefetch > 0:
         args.prefetch -= len(paths.pop().read_bytes())
     else:
         args.prefetch = 0
-

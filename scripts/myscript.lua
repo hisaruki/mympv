@@ -18,7 +18,7 @@ mp.add_key_binding(nil, "delete-confirm-and-next", function()
     result = string.gsub(result, "%s+", "")
     if result == "0" then
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("rm " .. path)
+        os.execute("")
         show_playlist()
     end
 end)
@@ -27,7 +27,7 @@ mp.add_key_binding(nil, "trash-and-next", function()
     if not mp.get_property("audio-codec") then
         local path = mp.get_property("stream-path")
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("mv " .. path .. " /tmp/")
+        os.execute("")
         show_playlist()
     end
 end)
@@ -36,9 +36,14 @@ mp.add_key_binding(nil, "move-and-next", function()
     if not mp.get_property("audio-codec") then
         local path = mp.get_property("stream-path")
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("mv " .. path .. " ~/Pictures/2d/")
+        os.execute("")
         show_playlist()
     end
+end)
+
+mp.add_key_binding(nil, "copy-desktop", function()
+    local path = mp.get_property("stream-path")
+    os.execute("")
 end)
 
 mp.add_key_binding(nil, "up", function()
@@ -59,7 +64,7 @@ mp.add_key_binding(nil, "down", function()
 end)
 mp.add_key_binding(nil, "left", function()
     if mp.get_property("audio-codec") then
-        mp.commandv("no-osd", "seek", "-1", "keyframes")
+        mp.commandv("no-osd", "seek", "-10", "keyframes")
     else
         mp.commandv("playlist-prev")
         show_playlist()
@@ -68,7 +73,7 @@ end)
 
 mp.add_key_binding(nil, "right", function()
     if mp.get_property("audio-codec") then
-        mp.commandv("no-osd", "seek", "1", "keyframes")
+        mp.commandv("no-osd", "seek", "10", "keyframes")
     else
         mp.commandv("playlist-next")
         show_playlist()
@@ -95,16 +100,6 @@ end)
 
 mp.add_key_binding(nil, "info", function()
     local path = mp.get_property("stream-path")
-
-    --[[
-    local handle = io.popen(
-        "sankaku -vvv --files "
-        .. path
-        .. " 2>&1"
-    )
-    local result = handle:read("*a")
-    handle:close()
-    ]]--
     local result = tostring(path)
     mp.commandv("show_text", tostring(result), "6000")
     
