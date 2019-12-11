@@ -1,4 +1,5 @@
 require 'os'
+require 'io'
 
 function show_playlist()
     local t = tostring(mp.get_property("playlist-pos-1"))
@@ -10,40 +11,18 @@ mp.add_key_binding(nil, "show_playlist", function() show_playlist() end)
 
 mp.add_key_binding(nil, "delete-confirm-and-next", function()
     local path = mp.get_property("stream-path")
-    local handle = io.popen(
-        'zenity --question --text "Are you sure you want to permanently delete this file?";echo $?'
-    )
-    local result = handle:read("*a")
-    handle:close()
-    result = string.gsub(result, "%s+", "")
-    if result == "0" then
-        mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("")
-        show_playlist()
-    end
 end)
 
-mp.add_key_binding(nil, "trash-and-next", function()
-    if not mp.get_property("audio-codec") then
-        local path = mp.get_property("stream-path")
-        mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("")
-        show_playlist()
-    end
+mp.add_key_binding(nil, "delete-and-next", function()
+    local path = mp.get_property("stream-path")
 end)
 
 mp.add_key_binding(nil, "move-and-next", function()
-    if not mp.get_property("audio-codec") then
-        local path = mp.get_property("stream-path")
-        mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-        os.execute("")
-        show_playlist()
-    end
+    local path = mp.get_property("stream-path")
 end)
 
 mp.add_key_binding(nil, "copy-desktop", function()
     local path = mp.get_property("stream-path")
-    os.execute("")
 end)
 
 mp.add_key_binding(nil, "up", function()
