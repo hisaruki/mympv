@@ -1,7 +1,6 @@
 require 'os'
 require 'io'
 
-
 function show_playlist()
     local t = tostring(mp.get_property("playlist-pos-1"))
     t = t  .. "/" .. tostring(mp.get_property("playlist-count"))
@@ -12,21 +11,34 @@ mp.add_key_binding(nil, "show_playlist", function() show_playlist() end)
 
 mp.add_key_binding(nil, "delete-confirm-and-next", function()
     local path = mp.get_property("stream-path")
-    os.execute("python3 command.py delete-confirm-next " .. path)
+    local handle = io.popen(
+        "python3 command.py delete-confirm-and-next " .. path
+    )
+    local result = handle:read("*a")
+    handle:close()
+    if result == "true" then
+        mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+        show_playlist()
+    end
 end)
 
 mp.add_key_binding(nil, "delete-and-next", function()
     local path = mp.get_property("stream-path")
     os.execute("python3 command.py delete-and-next " .. path)
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
 end)
 
 mp.add_key_binding(nil, "move-and-next", function()
     local path = mp.get_property("stream-path")
     os.execute("python3 command.py move-and-next " .. path)
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
 end)
 
 mp.add_key_binding(nil, "copy-desktop", function()
     local path = mp.get_property("stream-path")
+    os.execute("python3 command.py copy-desktop ")
     os.execute("python3 command.py copy-desktop " .. path)
 end)
 
