@@ -1,6 +1,20 @@
 require 'os'
 require 'io'
 
+function char_to_hex(c)
+    return string.format("%%%02X", string.byte(c))
+end
+function urlencode(url)
+    if url == nil then
+        return
+    end
+    url = url:gsub("\n", "\r\n")
+    url = url:gsub("([^%w ])", char_to_hex)
+    url = url:gsub(" ", "+")
+    return url
+end
+
+
 function show_playlist()
     local t = tostring(mp.get_property("playlist-pos-1"))
     t = t  .. "/" .. tostring(mp.get_property("playlist-count"))
@@ -11,11 +25,13 @@ mp.add_key_binding(nil, "show_playlist", function() show_playlist() end)
 
 mp.add_key_binding(nil, "delete-confirm-and-next", function()
     local path = mp.get_property("stream-path")
+    path = urlencode(path)
     local handle = io.popen(
         "python3 command.py delete-confirm-and-next " .. path
     )
     local result = handle:read("*a")
     handle:close()
+    -- Windowsがsys.exit(1)を解釈してくれないので標準出力で判定して分岐させる
     if result == "true" then
         mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
         show_playlist()
@@ -23,23 +39,22 @@ mp.add_key_binding(nil, "delete-confirm-and-next", function()
 end)
 
 mp.add_key_binding(nil, "delete-and-next", function()
-    local path = mp.get_property("stream-path")
-    os.execute("python3 command.py delete-and-next " .. path)
-    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-    show_playlist()
+
 end)
 
 mp.add_key_binding(nil, "move-and-next", function()
-    local path = mp.get_property("stream-path")
-    os.execute("python3 command.py move-and-next " .. path)
-    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-    show_playlist()
+
 end)
 
 mp.add_key_binding(nil, "copy-desktop", function()
     local path = mp.get_property("stream-path")
-    os.execute("python3 command.py copy-desktop ")
-    os.execute("python3 command.py copy-desktop " .. path)
+    path = urlencode(path)
+    local handle = io.popen(
+        "python3 command.py copy-desktop " .. path
+    )
+    local result = handle:read("*a")
+    print(result)
+    handle:close()
 end)
 
 mp.add_key_binding(nil, "up", function()
@@ -96,6 +111,7 @@ end)
 
 mp.add_key_binding(nil, "info", function()
     local path = mp.get_property("stream-path")
+    path = urlencode(path)
     local result = tostring(path)
     mp.commandv("show_text", tostring(result), "6000")
     
@@ -105,4 +121,3 @@ mp.add_key_binding(nil, "resetpan", function()
     mp.set_property("video-pan-x", 0)
     mp.set_property("video-pan-y", 0)
 end)
-
