@@ -39,11 +39,29 @@ mp.add_key_binding(nil, "delete-confirm-and-next", function()
 end)
 
 mp.add_key_binding(nil, "delete-and-next", function()
-
+    local path = mp.get_property("stream-path")
+    path = urlencode(path)
+    local handle = io.popen(
+        "python3 command.py delete " .. path
+    )
+    local result = handle:read("*a")
+    print(result)
+    handle:close()
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
 end)
 
-mp.add_key_binding(nil, "move-and-next", function()
-
+mp.add_key_binding(nil, "store-and-next", function()
+    local path = mp.get_property("stream-path")
+    path = urlencode(path)
+    local handle = io.popen(
+        "python3 command.py store " .. path
+    )
+    local result = handle:read("*a")
+    print(result)
+    handle:close()
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
 end)
 
 mp.add_key_binding(nil, "copy-desktop", function()
@@ -111,13 +129,31 @@ end)
 
 mp.add_key_binding(nil, "info", function()
     local path = mp.get_property("stream-path")
-    path = urlencode(path)
     local result = tostring(path)
     mp.commandv("show_text", tostring(result), "6000")
-    
+   
 end)
 
 mp.add_key_binding(nil, "resetpan", function()
     mp.set_property("video-pan-x", 0)
     mp.set_property("video-pan-y", 0)
+end)
+
+mp.add_key_binding(nil, "number", function(num)
+    if mp.get_property("audio-codec") then
+        num = tonumber(num) * 10
+        mp.commandv("osd-bar", "seek", tostring(num), "absolute-percent")
+    else
+        if num == "0" then
+            num = "10"
+        end
+        local path = mp.get_property("stream-path")
+        path = urlencode(path)
+        local handle = io.popen(
+            "python3 command.py fav " .. path .. " --value " .. tostring(num)
+        )
+        local result = handle:read("*a")
+        print(result)
+        handle:close()
+    end
 end)
