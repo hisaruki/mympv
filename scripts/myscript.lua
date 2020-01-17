@@ -51,6 +51,12 @@ mp.add_key_binding(nil, "delete-and-next", function()
     show_playlist()
 end)
 
+mp.add_key_binding(nil, "remove-and-next", function()
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
+end)
+
+
 mp.add_key_binding(nil, "store-and-next", function()
     local path = mp.get_property("stream-path")
     path = urlencode(path)
@@ -150,10 +156,12 @@ mp.add_key_binding(nil, "number", function(num)
         local path = mp.get_property("stream-path")
         path = urlencode(path)
         local handle = io.popen(
-            "python3 command.py fav " .. path .. " --value " .. tostring(num)
+            "python3 command.py rate " .. path .. " --value " .. tostring(num)
         )
         local result = handle:read("*a")
         print(result)
         handle:close()
+        mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+        show_playlist()
     end
 end)
