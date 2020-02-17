@@ -27,7 +27,7 @@ mp.add_key_binding(nil, "delete-confirm-and-next", function()
     local path = mp.get_property("stream-path")
     path = urlencode(path)
     local handle = io.popen(
-        "python3 command.py delete-confirm-and-next " .. path
+        "python command.py delete-confirm-and-next " .. path
     )
     local result = handle:read("*a")
     handle:close()
@@ -42,13 +42,13 @@ mp.add_key_binding(nil, "delete-and-next", function()
     local path = mp.get_property("stream-path")
     path = urlencode(path)
     local handle = io.popen(
-        "python3 command.py delete " .. path
+        "python command.py delete " .. path
     )
+    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
+    show_playlist()
     local result = handle:read("*a")
     print(result)
     handle:close()
-    mp.commandv("playlist-remove", mp.get_property("playlist-pos"))
-    show_playlist()
 end)
 
 mp.add_key_binding(nil, "remove-and-next", function()
@@ -61,7 +61,7 @@ mp.add_key_binding(nil, "store-and-next", function()
     local path = mp.get_property("stream-path")
     path = urlencode(path)
     local handle = io.popen(
-        "python3 command.py store " .. path
+        "python command.py store " .. path
     )
     local result = handle:read("*a")
     print(result)
@@ -74,7 +74,7 @@ mp.add_key_binding(nil, "copy-desktop", function()
     local path = mp.get_property("stream-path")
     path = urlencode(path)
     local handle = io.popen(
-        "python3 command.py copy-desktop " .. path
+        "python command.py copy-desktop " .. path
     )
     local result = handle:read("*a")
     print(result)
@@ -156,7 +156,7 @@ mp.add_key_binding(nil, "number", function(num)
         local path = mp.get_property("stream-path")
         path = urlencode(path)
         local handle = io.popen(
-            "python3 command.py rate " .. path .. " --value " .. tostring(num)
+            "python command.py rate " .. path .. " --value " .. tostring(num)
         )
         local result = handle:read("*a")
         print(result)
